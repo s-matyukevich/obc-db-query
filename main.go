@@ -22,7 +22,7 @@ func main() {
 
 	db, h, err := gorocksdb.OpenDbColumnFamilies(opts, dbPath,
 		[]string{"default", "blockchainCF", "indexesCF", "stateDeltaCF", "stateCF"},
-		[]*gorocksdb.Options{opts, opts, opts.opts, opts})
+		[]*gorocksdb.Options{opts, opts, opts, opts, opts})
 
 	if err != nil {
 		fmt.Printf(err.Error() + "\n")
