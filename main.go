@@ -13,7 +13,7 @@ import (
 
 func main() {
 	var dbPath string
-	flag.StringVar(&dbPath, "db", "", "Database path")
+	flag.StringVar(&dbPath, "d", "", "Database path")
 	flag.Parse()
 
 	opts := gorocksdb.NewDefaultOptions()
