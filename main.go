@@ -1,9 +1,9 @@
 package main
 
 import (
+	"encoding/binary"
 	"flag"
 	"fmt"
-	"encoding/binary"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/kr/pretty"
@@ -25,7 +25,7 @@ func main() {
 		[]*gorocksdb.Options{opts})
 
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Printf(err.Error() + "\n")
 		return
 	}
 
@@ -38,13 +38,13 @@ func main() {
 		key := iterator.Key()
 		val := iterator.Value()
 		keyData := string(key.Data())
-		if keyData == "blockCount"{
+		if keyData == "blockCount" {
 			res[keyData] = binary.BigEndian.Uint64(val.Data())
 		} else {
 			block := &protos.Block{}
 			err := proto.Unmarshal(val.Data(), block)
 			if err != nil {
-				fmt.Printf(err.Error())
+				fmt.Printf(err.Error() + "\n")
 				return
 			}
 			res[keyData] = block
