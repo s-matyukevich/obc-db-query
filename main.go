@@ -21,8 +21,8 @@ func main() {
 	opts.SetCreateIfMissing(false)
 
 	db, h, err := gorocksdb.OpenDbColumnFamilies(opts, dbPath,
-		[]string{"default", "blockchainCF"},
-		[]*gorocksdb.Options{opts, opts})
+		[]string{"default", "blockchainCF", "indexesCF", "stateDeltaCF", "stateCF"},
+		[]*gorocksdb.Options{opts, opts, opts.opts, opts})
 
 	if err != nil {
 		fmt.Printf(err.Error() + "\n")
