@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"encoding/binary"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/kr/pretty"
@@ -11,13 +12,6 @@ import (
 )
 
 func main() {
-	dbmap := map[string]func([]byte) (interface{}, error){
-		"blockchainCF": func(b []byte) (interface{}, error) {
-			res := &protos.Block{}
-			err := proto.Unmarshal(b, res)
-			return res, err
-		},
-	}
 	var dbPath string
 	flag.StringVar(&dbPath, "db", "", "Database path")
 	flag.Parse()
@@ -31,25 +25,30 @@ func main() {
 		[]*gorocksdb.Options{opts})
 
 	if err != nil {
-		fmt.Pritf(err.Error())
+		fmt.Printf(err.Error())
 		return
 	}
 
 	opt := gorocksdb.NewDefaultReadOptions()
 	defer opt.Destroy()
-	iterator := db.NewIteratorCF(opt, cfHandler)
+	iterator := db.NewIteratorCF(opt, h[0])
 
 	res := make(map[string]interface{}, 0)
-	for ; iterator.IsValid(); iterator.IsValid() {
-		val := iterator.Value()
+	for ; iterator.Valid(); iterator.Next() {
 		key := iterator.Key()
-		block := &protos.Block{}
-		err := proto.Unmarshal(val, block)
-		if err != nil {
-			fmt.Printf(err.Error())
-			return
+		val := iterator.Value()
+		keyData := string(key.Data())
+		if keyData == "blockCount"{
+			res[keyData] = binary.BigEndian.Uint64(val.Data())
+		} else {
+			block := &protos.Block{}
+			err := proto.Unmarshal(val.Data(), block)
+			if err != nil {
+				fmt.Printf(err.Error())
+				return
+			}
+			res[keyData] = block
 		}
-		res = append(res, block)
 	}
 	pretty.Printf("%# v\n", res)
 }
